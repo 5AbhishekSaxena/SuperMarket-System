@@ -129,7 +129,7 @@ class product
 			cout<<"\nModify Product's Price: ";
 			cin>>price;
 		}
-		void modify_prduct_stock()
+		void modify_product_stock()
 		{
 			int astock=0;
 			cout<<"\nProduct Number: "<<lpno;
@@ -467,6 +467,35 @@ void modify_product_price()
 					pd.show_product();
 					cout<<"\nEnter The New Details of product"<<endl;
 					pd.modify_product_price();
+					int pos=-1*sizeof(pd);
+					fp.seekp(pos,ios::cur);
+					fp.write((char*)&pd,sizeof(product));
+					cout<<"\n\n\t Record Updated";
+					found=1;
+			}
+		}
+		fp.close();
+		if(found==0)
+		cout<<"\n\n Record Not Found ";
+		getch();
+}
+
+void modify_product_stock()
+{
+		int n;
+		int found=0;
+		clrscr();
+		cout<<"\n\n\tMODIFY PRODUCT REOCORD - Stock ";
+		cout<<"\n\n\tEnter The Number of The Product: ";
+		cin>>n;
+		fp.open("product.dat",ios::in|ios::out);
+		while(fp.read((char*)&pd,sizeof(product)) && found==0)
+		{
+			if(pd.retpno()==n)
+			{
+					pd.show_product();
+					cout<<"\nEnter The New Details of product"<<endl;
+					pd.modify_product_stock();
 					int pos=-1*sizeof(pd);
 					fp.seekp(pos,ios::cur);
 					fp.write((char*)&pd,sizeof(product));
@@ -1219,7 +1248,7 @@ void admin_menu_m()
 				else
 				cout<<"Only Managers And Above Can Change The Member Settings";
 				break;
-			case 7: if(staff_c>=2);
+			case 7: if(staff_c>=2)
 				modify_product_stock();
 				else
 				cout<<"Only Managers And Above Can Add Stocks Settings";
@@ -1275,7 +1304,7 @@ void admin_menu_p()
 						}
 					}
 					break;
-			case 5: modify_prod_stock();
+			case 5: modify_product_stock();
 				break;
 			case 22: return;
 			default:cout<<"\a";
