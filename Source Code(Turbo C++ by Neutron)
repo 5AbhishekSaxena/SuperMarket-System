@@ -83,7 +83,7 @@ int stock=0;
 
 class product
 {
-		int lpno,stock,price;
+		int lpno,lstock,price;
 		char pname[50];
 		char cname[20];
 		public:
@@ -599,7 +599,7 @@ void amodify_sup()
 		int found=0;
 		clrscr();
 		cout<<"\n\n\tMODIFY MEMBER RECORD";
-		cout<<"\n\n\tEnter The ID Number of The /MemberSupplier: ";
+		cout<<"\n\n\tEnter The ID Number of The Member/Supplier: ";
 		cin>>n;
 		fp.open("member.dat",ios::in|ios::out);
 		while(fp.read((char*)&mem,sizeof(member)) && found==0)
@@ -755,7 +755,7 @@ void display_allp()
 		}
 cout<<"\n\n\t\tProduct LIST\n\n";
  cout<<"=========================================================================\n";
-cout<<"Product Number"<<setw(20)<<"Product Name"<<setw(25)<<"Company"<<"Cost<<"<<"Stock\n";
+cout<<"Product Number"<<setw(20)<<"Product Name"<<setw(25)<<"Company"<<"Cost<<"<<setw(5)<<"Stock\n";
 cout<<"=========================================================================\n";
 		while(fp.read((char*)&pd,sizeof(product)))
 		{
@@ -764,13 +764,14 @@ cout<<"=========================================================================
 		fp.close();
 		getch();
 }
-void product_issue()
+void product_sale()
 {
 		int pn;
 		int mn;
+		int bill=0;
 		int found=0,flag=0;
 		clrscr();
-		cout<<"\n\nPRODUCT ISSUE ";
+		cout<<"\n\nPRODUCT Sale ";
 		mn=fid;
 		cout<<"\n\n\tThe Member's User ID:"<<mn;
 		//cin>>sn;
@@ -778,15 +779,24 @@ void product_issue()
 		fp1.open("product.dat",ios::in|ios::out);
 		while(fp.read((char*)&mem,sizeof(member)) && found==0)
 		{
+		    while(pno!=0)
+		      {
 			if(mem.retid()==mn)
 			{
 					found=1;
 					//if(mem.rettoken()==0)
 			//{
 					cout<<"\n\n\tEnter The Product Number: ";
-					cin>>bn;
+					cin>>pn;
 					while(fp1.read((char*)&pd,sizeof(product))&& flag==0)
-					{
+					{       if(pd.retstock()==0)
+
+							cout<<"This Product Is Out Of Stock. We Are Sorry For The Inconvinience";
+							//break;
+						else
+						if(pn==0)
+						break;
+						else
 						if(pd.retpno()==*pno)
 						{
 								pd.show_product();
@@ -797,17 +807,23 @@ void product_issue()
 								fp.seekp(pos,ios::cur);
 								fp.write((char*)&mem,sizeof(member));
 								cout<<"\n\n\t Product Added";
+								bill+=pd.retprice();
+								stock--;
 						}
 					}
-		if(flag==0)
-		cout<<"Product no does not exist";
-		}
-		}		}
-		if(found==0)
+					if(flag==0)
+					cout<<"Product no does not exist";
+				}
+			}
+				if(found==0)
 			cout<<"Member record not exist";
+
 		getch();
+		}
 		fp.close();
 		fp1.close();
+		cout<<"\n\nBILL";
+		cout<<"\nTotal Amount To Be Paid: "<<bill;
 }
 /*
 void product_deposit()
@@ -1090,23 +1106,20 @@ void main_menu()
 		{
 			clrscr();
 			cout<<"\n\n\n\tMAIN MENU";
-			cout<<"\n\n\t01. Product Issue";
-			cout<<"\n\n\t02. Product Deposit";
-			cout<<"\n\n\t03. Staff Menu";
-			cout<<"\n\n\t04. Settings";
-			cout<<"\n\n\t05. Log Out";
-			cout<<"\n\n\t06. Key Features";
+			cout<<"\n\n\t01. Product Sale";
+			cout<<"\n\n\t02. Staff Menu";
+			cout<<"\n\n\t03. Settings";
+			cout<<"\n\n\t04. Log Out";
+			cout<<"\n\n\t05. Key Features";
 			cout<<"\n\n\tPlease Select Your Option (1-6) ";
 			cout<<"Enter choice: ";
 			cin>>ch;
 			switch(ch)
 			{
 					case 1: clrscr();
-						product_issue();
+						product_sale();
 						break;
-					case 2: product_deposit();
-						break;
-					case 3: if(staff_c>=1)
+					case 2: if(staff_c>=1)
 						{
 								admin_menu();
 						}
@@ -1120,13 +1133,13 @@ void main_menu()
 								main_menu();
 						}
 						break;
-					case 4:
+					case 3:
 						clrscr();
 						settings();
-					case 5: fid=0;
+					case 4: fid=0;
 						login_intro();
 						break;
-					case 6: featuresp();
+					case 5: featuresp();
 						break;
 					default :cout<<"\a";
 			}
@@ -1206,7 +1219,7 @@ void admin_menu_m()
 				else
 				cout<<"Only Managers And Above Can Change The Member Settings";
 				break;
-			case 7: if(staf_c>=2);
+			case 7: if(staff_c>=2);
 				modify_product_stock();
 				else
 				cout<<"Only Managers And Above Can Add Stocks Settings";
