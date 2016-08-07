@@ -1,4 +1,4 @@
-#Supermarket-Management-PProgram
+#Supermarket-Management-Program
 
 It is a simple Supermarket Management Program which includes the following freatures.
 
