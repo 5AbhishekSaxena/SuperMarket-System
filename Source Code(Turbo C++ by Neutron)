@@ -806,131 +806,74 @@ cout<<"=========================================================================
 		fp.close();
 		getch();
 }
-void product_sale()
+int product_sale(int pn)
 {
-		int pn=0,mn=0,bill=0,found=0,flag=0,count=0;
-		clrscr();
-		cout<<"\n\nPRODUCT Sale ";
-		mn=fid;
-		cout<<"\n\n\tThe Member's User ID:"<<mn;
-		//cin>>sn;
-		fp.open("member.dat",ios::in|ios::out);
+		int flag=0,count=0;
 		fp1.open("product.dat",ios::in|ios::out);
-		while(fp.read((char*)&mem,sizeof(member)) && found==0)
 		{
-		    while(pno!=0)
-		      {
-			if(mem.retid()==mn)
+			while(pn!=0)
 			{
-					found=1;
-					     flag=0;
-
-						//if(mem.rettoken()>=0)
-						//{
-							cout<<"\n\n\tEnter The Product Number: ";
-							cin>>pn;
-							while(fp1.read((char*)&pd,sizeof(product))&& flag==0)
-							{       if(pd.retstock()==0)
-								 {
-									cout<<"This Product Is Out Of Stock. We Are Sorry For The Inconvinience";
-									break;       }
-								else
-									if(pn==0)
-									main_menu();
-									else
-										if(pd.retpno()==pn)
-									{
-										//pd.show_product();
-										flag=1;
-										//mem.addtoken();
-										//mem.getstpno(pd.retpno());
-										int pos=-1*sizeof(mem);
-										fp.seekp(pos,ios::cur);
-										fp.write((char*)&mem,sizeof(member));
-										cout<<"\n\n\t Product Added";
-										//bill+=pd.retprice();
-										//pd.dstock();
-										bill+=pd.product_sale();
-										cout<<"\n\nBill: "<<bill;
-										cout<<"\nStock"<<pd.retstock();
-
-
-								      } }
-						}
-					if(flag==0)
+				flag=0;
+				while(fp1.read((char*)&pd,sizeof(product))&& flag==0)
+				{
+					if(pd.retstock()==0)
 					{
-						cout<<"Product no does not exist";
-						count++;
-						if(count==3)
-						return;
-					}
-				}
-			}
-				if(found==0)
-			cout<<"Member record not exist";
-
-		getch();
-		//}
-		//}
-		fp.close();
-		fp1.close();
-		cout<<"\n\nBILL";
-		cout<<"\nTotal Amount To Be Paid: "<<bill;
-		mem.addtoken(bill);
-}
-/*
-void product_deposit()
-{
-		int bn;
-		int mn;
-		int found=0,flag=0,day,fine;
-		clrscr();
-		cout<<"\n\nPRODUCT DEPOSIT ";
-		mn=fid;
-		cout<<"\n\n\tThe Member's ID: "<<mn;
-		fp.open("member.dat",ios::in|ios::out);
-		fp1.open("product.dat",ios::in|ios::out);
-		while(fp.read((char*)&mem,sizeof(member)) && found==0)
-		{
-			if(mem.retid()==mn)
-			{
-					found=1;
-					if(mem.rettoken()==1)
-					{
-						while(fp1.read((char*)&pd,sizeof(product))&& flag==0)
-						{
-								if(pd.retpno()==mem.retstpno())
-								{
-									pd.show_product();
-									flag=1;
-									cout<<"\n\nProduct Deposited in Number of Days: ";
-									cin>>day;
-									if(day>15)
-										{
-											fine=(day-15)*1;
-											cout<<"\n\nFine has to deposited Rs. "<<fine;
-									}
-								mem.resettoken();
-								int pos=-1*sizeof(mem);
-								fp.seekp(pos,ios::cur);
-								fp.write((char*)&mem,sizeof(member));
-								cout<<"\n\n\t Product deposited successfully";
-								}
-						}
-						if(flag==0)
-						cout<<"Product no does not exist";
+						cout<<"This Product Is Out Of Stock. We Are Sorry For The Inconvenience";
+						break;
 					}
 					else
-					cout<<"No product is issued..please check!!";
+						if(pn==0)
+						main_menu();
+						else
+							if(pd.retpno()==pn)
+							{
+								pd.show_product();
+								return pd.retprice();
+							}
+				}
 			}
-		}
-		if(found==0)
-		cout<<"Member record does not exist";
+				if(flag==0)
+				{
+					cout<<"Product no does not exist";
+					count++;
+					if(count==3)
+					main_menu();
+		}		}
 		getch();
-		fp.close();
 		fp1.close();
+		return 0;
+
 }
-*/
+
+void billing()
+{
+	clrscr();
+	int pn=0,mn=0,bill=0,found=0;
+	cout<<"\n\nPRODUCT Sale ";
+	mn=fid;
+	cout<<"\n\n\tThe Member's User ID:"<<mn;
+	fp.open("member.dat",ios::in|ios::out);
+	while(fp.read((char*)&mem,sizeof(member)) && found==0)
+	{
+	    while(pno!=0)
+	    {
+		if(mem.retid()==mn)
+		{
+			found=1;
+			cout<<"\n\n\tEnter The Product Number: ";
+			cin>>pn;
+			if(pn!=0)
+			bill+=product_sale(pn);
+			int pos=-1*sizeof(mem);
+			fp.seekp(pos,ios::cur);
+			fp.write((char*)&mem,sizeof(member));
+
+		}
+	    }
+	}
+	fp.close();
+	mem.addtoken(bill);
+}
 
 void intro()
 {
@@ -1170,7 +1113,7 @@ void main_menu()
 			switch(ch)
 			{
 					case 1: clrscr();
-						product_sale();
+						billing();
 						break;
 					case 2: if(staff_c>=1)
 						{
@@ -1388,6 +1331,7 @@ void main()
 		login_intro();
 
 }
+
 
 
 
