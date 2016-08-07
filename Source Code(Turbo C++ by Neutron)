@@ -105,9 +105,9 @@ class product
 		}
 		void show_product()
 		{
-			cout<<"\nProduct Number : "<<lpno;
-			cout<<"\nProduct Name : "<<pname;
-			cout<<"\nCompany's Name : "<<cname;
+			cout<<"\nProduct Number: "<<lpno;
+			cout<<"\nProduct Name: "<<pname;
+			cout<<"\nCompany's Name: "<<cname;
 			cout<<"\nPrice: "<<price;
 			cout <<"\nStock: "<<lstock;
 		}
@@ -154,6 +154,15 @@ class product
 		int retstock()
 		{
 			return lstock;
+		}
+
+		char* retpname()
+		{
+		      return pname;
+		}
+		char* retcname()
+		{
+			return cname;
 		}
 
 		void dstock()
@@ -663,62 +672,6 @@ void amodify_sup()
 		cout<<"\n\n Record Not Found ";
 		getch();
 }
-/*
-void delete_member()
-{
-		int n;
-		int flag=0;
-		clrscr();
-		cout<<"\n\n\n\tDELETE MEMBER";
-		cout<<"\n\nEnter The Admission Number of the Member You Want To Delete : ";
-		cin>>n;
-		fp.open("member.dat",ios::in|ios::out);
-		fstream fp2;
-		fp2.open("Temp.dat",ios::out);
-		fp.seekg(0,ios::beg);
-		while(fp.read((char*)&mem,sizeof(member)))
-		{
-			if(mem.retid()!=n)
-			fp2.write((char*)&mem,sizeof(member));
-			else
-			flag=1;
-		}
-		fp2.close();
-		fp.close();
-		remove("member.dat");
-		rename("Temp.dat","member.dat");
-		if(flag==1)
-		cout<<"\n\n\tRecord Deleted ..";
-		else
-		cout<<"\n\nRecord not found";
-		getch();
-}
-void delete_product()
-{
-		int n;
-		clrscr();
-		cout<<"\n\n\n\tDELETE PRODUCT";
-		cout<<"\n\nEnter The Number of the Product You Want To Delete : ";
-		cin>>n;
-		fp.open("product.dat",ios::in|ios::out);
-		fstream fp2;
-		fp2.open("Temp.dat",ios::out);
-		fp.seekg(0,ios::beg);
-		while(fp.read((char*)&pd,sizeof(product)))
-		{
-			if(pd.retpno()!=n)
-			{
-					fp2.write((char*)&pd,sizeof(product));
-			}
-		}
-		fp2.close();
-		fp.close();
-		remove("product.dat");
-		rename("Temp.dat","product.dat");
-		cout<<"\n\n\tRecord Deleted ..";
-		getch();
-}
-*/
 void display_alls()
 {
 		clrscr();
@@ -808,7 +761,7 @@ cout<<"=========================================================================
 }
 int product_sale(int pn)
 {
-		int flag=0,count=0;
+		int flag=0,count=0,price=0;
 		fp1.open("product.dat",ios::in|ios::out);
 		{
 			while(pn!=0)
@@ -826,9 +779,12 @@ int product_sale(int pn)
 						main_menu();
 						else
 							if(pd.retpno()==pn)
-							{
-								pd.show_product();
-								return pd.retprice();
+							{       pd.dstock();
+								cout<<pd.retcname()<<" "<<pd.retpname()<<"Cost: "<<pd.retprice();
+								price=pd.retprice();
+								int pos=-1*sizeof(pd);
+								fp1.seekp(pos,ios::cur);
+								fp1.write((char*)&pd,sizeof(product));
 							}
 				}
 			}
@@ -841,7 +797,7 @@ int product_sale(int pn)
 		}		}
 		getch();
 		fp1.close();
-		return 0;
+		return price;
 
 }
 
@@ -855,22 +811,21 @@ void billing()
 	fp.open("member.dat",ios::in|ios::out);
 	while(fp.read((char*)&mem,sizeof(member)) && found==0)
 	{
-	    while(pno!=0)
-	    {
-		if(mem.retid()==mn)
-		{
-			found=1;
-			cout<<"\n\n\tEnter The Product Number: ";
-			cin>>pn;
-			if(pn!=0)
-			bill+=product_sale(pn);
-			int pos=-1*sizeof(mem);
-			fp.seekp(pos,ios::cur);
-			fp.write((char*)&mem,sizeof(member));
-
-		}
-	    }
-	}
+			if(mem.retid()==mn)
+			{
+				found=1;
+				do{
+					cout<<"\n\n\tEnter The Product Number: ";
+					cin>>pn;
+					if(pn!=0)
+					{
+						bill+=product_sale(pn);
+						int pos=-1*sizeof(mem);
+						fp.seekp(pos,ios::cur);
+						fp.write((char*)&mem,sizeof(member));
+					}
+				}while(pn);
+	}               }
 	fp.close();
 	mem.addtoken(bill);
 }
