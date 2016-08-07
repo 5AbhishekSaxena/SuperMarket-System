@@ -139,6 +139,14 @@ class product
 			stock+=astock;
 		}
 
+		int product_sale()
+		{       int lbill=0;
+			show_product();
+			lbill=+retprice();
+			dstock();
+			return lbill;
+		}
+
 		int retpno()
 		{
 			return lpno;
@@ -146,6 +154,11 @@ class product
 		int retstock()
 		{
 			return lstock;
+		}
+
+		void dstock()
+		{
+			lstock--;
 		}
 		int retprice()
 		{
@@ -260,9 +273,9 @@ class member
 		{
 			return token;
 		}
-		void addtoken()
+		void addtoken(int a)
 		{
-			token=1;
+			token=a;
 		}
 		void resettoken()
 		{
@@ -784,7 +797,7 @@ void display_allp()
 		}
 cout<<"\n\n\t\tProduct LIST\n\n";
  cout<<"=========================================================================\n";
-cout<<"Product Number"<<setw(20)<<"Product Name"<<setw(25)<<"Company"<<"Cost<<"<<setw(5)<<"Stock\n";
+cout<<"Product Number"<<setw(20)<<"Product Name"<<setw(15)<<"Company"<<setw(10)<<"Cost<<"<<setw(5)<<"Stock\n";
 cout<<"=========================================================================\n";
 		while(fp.read((char*)&pd,sizeof(product)))
 		{
@@ -795,10 +808,7 @@ cout<<"=========================================================================
 }
 void product_sale()
 {
-		int pn;
-		int mn;
-		int bill=0;
-		int found=0,flag=0;
+		int pn=0,mn=0,bill=0,found=0,flag=0,count=0;
 		clrscr();
 		cout<<"\n\nPRODUCT Sale ";
 		mn=fid;
@@ -813,46 +823,60 @@ void product_sale()
 			if(mem.retid()==mn)
 			{
 					found=1;
-					//if(mem.rettoken()==0)
-			//{
-					cout<<"\n\n\tEnter The Product Number: ";
-					cin>>pn;
-					while(fp1.read((char*)&pd,sizeof(product))&& flag==0)
-					{       if(pd.retstock()==0)
+					     flag=0;
 
-							cout<<"This Product Is Out Of Stock. We Are Sorry For The Inconvinience";
-							//break;
-						else
-						if(pn==0)
-						break;
-						else
-						if(pd.retpno()==*pno)
-						{
-								pd.show_product();
-								flag=1;
-								mem.addtoken();
-								mem.getstpno(pd.retpno());
-								int pos=-1*sizeof(mem);
-								fp.seekp(pos,ios::cur);
-								fp.write((char*)&mem,sizeof(member));
-								cout<<"\n\n\t Product Added";
-								bill+=pd.retprice();
-								stock--;
+						//if(mem.rettoken()>=0)
+						//{
+							cout<<"\n\n\tEnter The Product Number: ";
+							cin>>pn;
+							while(fp1.read((char*)&pd,sizeof(product))&& flag==0)
+							{       if(pd.retstock()==0)
+								 {
+									cout<<"This Product Is Out Of Stock. We Are Sorry For The Inconvinience";
+									break;       }
+								else
+									if(pn==0)
+									main_menu();
+									else
+										if(pd.retpno()==pn)
+									{
+										//pd.show_product();
+										flag=1;
+										//mem.addtoken();
+										//mem.getstpno(pd.retpno());
+										int pos=-1*sizeof(mem);
+										fp.seekp(pos,ios::cur);
+										fp.write((char*)&mem,sizeof(member));
+										cout<<"\n\n\t Product Added";
+										//bill+=pd.retprice();
+										//pd.dstock();
+										bill+=pd.product_sale();
+										cout<<"\n\nBill: "<<bill;
+										cout<<"\nStock"<<pd.retstock();
+
+
+								      } }
 						}
-					}
 					if(flag==0)
-					cout<<"Product no does not exist";
+					{
+						cout<<"Product no does not exist";
+						count++;
+						if(count==3)
+						return;
+					}
 				}
 			}
 				if(found==0)
 			cout<<"Member record not exist";
 
 		getch();
-		}
+		//}
+		//}
 		fp.close();
 		fp1.close();
 		cout<<"\n\nBILL";
 		cout<<"\nTotal Amount To Be Paid: "<<bill;
+		mem.addtoken(bill);
 }
 /*
 void product_deposit()
