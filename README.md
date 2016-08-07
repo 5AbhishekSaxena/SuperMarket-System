@@ -9,4 +9,4 @@ Entire Information is secured using classes.
 Program is highly user friendly.
 I would really appreciate if anyone would like to contribute to this project and make it better.
 
-~Note: The first registered user, that is, Member ID 100 is given Owner permisions by default.
+Note: The first registered user, that is, Member ID 100 is given Owner permisions by default.
