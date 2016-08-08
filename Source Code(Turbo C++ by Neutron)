@@ -1,3 +1,4 @@
+
 #include<fstream.h>
 #include<conio.h>
 #include<stdio.h>
@@ -136,7 +137,7 @@ class product
 			cout<<"\nProduct Company and Name: "<<cname<<", "<<pname;
 			cout<<"\nAmount Items Added: ";
 			cin>>astock;
-			stock+=astock;
+			lstock+=astock;
 		}
 
 		int product_sale()
@@ -174,7 +175,7 @@ class product
 			return price;
 		}
 		void report()
-		{ cout<<lpno<<setw(10)<<pname<<setw(10)<<cname<<setw(10)<<price<<lstock<<endl;}
+		{ cout<<lpno<<setw(10)<<pname<<setw(10)<<cname<<setw(10)<<price<<setw(10)<<lstock<<endl;}
 
 
 }; //class ends here
@@ -218,9 +219,6 @@ class member
 			puts(name);
 			cout<<"\nPassword(Spaces are not allowed): ";
 			puts(pw);
-			//cout<<"\nNo of Product issued : "<<token;
-			//if(token==1)
-			//cout<<"\nProduct Number: "<<mempno;
 		}
 
 		void amodify_staff();
@@ -749,7 +747,7 @@ void display_allp()
 		return;
 		}
 cout<<"\n\n\t\tProduct LIST\n\n";
- cout<<"=========================================================================\n";
+cout<<"=========================================================================\n";
 cout<<"Product Number"<<setw(20)<<"Product Name"<<setw(15)<<"Company"<<setw(10)<<"Cost<<"<<setw(5)<<"Stock\n";
 cout<<"=========================================================================\n";
 		while(fp.read((char*)&pd,sizeof(product)))
@@ -759,45 +757,42 @@ cout<<"=========================================================================
 		fp.close();
 		getch();
 }
+
 int product_sale(int pn)
 {
-		int flag=0,count=0,price=0;
-		fp1.open("product.dat",ios::in|ios::out);
-		{
-			while(pn!=0)
+	int flag=0,price=0;
+	fp1.open("product.dat",ios::in|ios::out);
+	{
+			flag=0;
+			while(fp1.read((char*)&pd,sizeof(product))&& flag==0)
 			{
-				flag=0;
-				while(fp1.read((char*)&pd,sizeof(product))&& flag==0)
+				if(pd.retstock()==0)
 				{
-					if(pd.retstock()==0)
-					{
-						cout<<"This Product Is Out Of Stock. We Are Sorry For The Inconvenience";
-						break;
-					}
-					else
-						if(pn==0)
-						main_menu();
-						else
-							if(pd.retpno()==pn)
-							{       pd.dstock();
-								cout<<pd.retcname()<<" "<<pd.retpname()<<"Cost: "<<pd.retprice();
-								price=pd.retprice();
-								int pos=-1*sizeof(pd);
-								fp1.seekp(pos,ios::cur);
-								fp1.write((char*)&pd,sizeof(product));
-							}
+					cout<<"This Product Is Out Of Stock. We Are Sorry For The Inconvenience";
+					break;
+				}
+				else
+				{
+						if(pd.retpno()==pn)
+						{       flag=1;
+							pd.dstock();
+							cout<<pd.retcname()<<" "<<pd.retpname()<<" Cost: "<<pd.retprice()<<endl;
+							price=pd.retprice();
+							int pos=-1*sizeof(pd);
+							fp1.seekp(pos,ios::cur);
+							fp1.write((char*)&pd,sizeof(product));
+							continue;
+						}
 				}
 			}
-				if(flag==0)
-				{
-					cout<<"Product no does not exist";
-					count++;
-					if(count==3)
-					main_menu();
-		}		}
-		getch();
-		fp1.close();
-		return price;
+			if(flag==0 && pn!=0)
+			{
+				cout<<"\nProduct no does not exist";
+			}
+	}
+	getch();
+	fp1.close();
+	return price;
 
 }
 
@@ -808,26 +803,31 @@ void billing()
 	cout<<"\n\nPRODUCT Sale ";
 	mn=fid;
 	cout<<"\n\n\tThe Member's User ID:"<<mn;
+	cout<<"\n\tEnter '0' to Get The Total\n\n";
+	do{
+		cout<<"\n\tEnter The Product Number: ";
+		cin>>pn;
+		bill+=product_sale(pn);
+		cout<<"\n\tCurrent Bill: "<<bill;
+	}while(pn!=0);
+	mem.addtoken(bill);
+	cout<<"\n\tTotal Amount: "<<bill;
+	cout<<"\n\n\tPress ENTER To Go To Main Menu";
+	getch();
 	fp.open("member.dat",ios::in|ios::out);
 	while(fp.read((char*)&mem,sizeof(member)) && found==0)
 	{
 			if(mem.retid()==mn)
 			{
 				found=1;
-				do{
-					cout<<"\n\n\tEnter The Product Number: ";
-					cin>>pn;
-					if(pn!=0)
-					{
-						bill+=product_sale(pn);
-						int pos=-1*sizeof(mem);
-						fp.seekp(pos,ios::cur);
-						fp.write((char*)&mem,sizeof(member));
-					}
-				}while(pn);
-	}               }
+				int pos=-1*sizeof(mem);
+				fp.seekp(pos,ios::cur);
+				fp.write((char*)&mem,sizeof(member));
+			}
+	}
 	fp.close();
-	mem.addtoken(bill);
+	main_menu();
+
 }
 
 void intro()
@@ -836,7 +836,8 @@ void intro()
 		cout<<"\t\tSUPER";
 		cout<<"\n\t\tMARKET";
 		cout<<"\n\t\tSYSTEM";
-		cout<<"\n\nMADE BY: Abhishek Saxena";
+		cout<<"\n\tMADE BY: Abhishek Saxena";
+		cout<<"\n\n\n\t All CopyRights reserved";
 		getch();
 }
 
@@ -885,13 +886,13 @@ void guest_access()
 								clrscr();
 								write_member();
 						}
-						//break;
 						else
 						return;
 						break;
 					case 11: login_intro();
 						 break;
 					case 99:mkey=0;
+						staff_c=4;
 						admin_menu();
 					default: "\a";
 			}
@@ -1043,11 +1044,15 @@ void id_update()
 
 void featuresp()
 {
+	clrscr();
 	cout<<"1. Product ID and Member ID is auto generated and updated."<<endl;
 	cout<<"2. Program got administrative features only for Staff Members."<<endl;
 	cout<<"3. Each Member have his unique ID and a password."<<endl;
 	cout<<"4. Entire Information is secured using classes."<<endl;
 	cout<<"5. Program is highly user friendly."<<endl;
+	cout<<"\n\nPress ENTER To Go To Main Menu";
+	getch();
+
 
 }
 void main_menu()
@@ -1286,6 +1291,7 @@ void main()
 		login_intro();
 
 }
+
 
 
 
